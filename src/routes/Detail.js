@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import styled from "styled-components"; // styled-components 를 사용하면 css 파일 없어도 JS 파일에서 전부 해결 가능
 
@@ -26,10 +27,57 @@ function Detail(props) { // App.js 에 있는 데이터를 바인딩 하기 위�
   // let 찾은상품 = props.shoes.find(function(x) {
   //   return x.id == id
   // });
+
+  let [show, setShow] = useState(true); // 2초 뒤에 보이고 사라지는 것을 구현 할 스위치
+  let [count, setCount] = useState(0);
+  let [num, setNum] = useState('');
+  // useEffect => mount 또는 update 될 때 코드를 실행해줌
+  // useEffect 동작원리, 사용 이유 => useEffect 안에 있는 코드는 html 을 먼저 렌더링 한 후에 동작한다.
+  // html 을 조금 더 빨리 보여주기 위해서 시간이 오래걸리는 어려운 코드는 html 먼저 렌더링 후 동작하게 끔
+  // 사용자가 좀 더 빠른 느낌을 줄 수 있다는 장점이 있고
+  // 특히 서버에서 데이터 가져오는 로직같은 경우, 타이머기능 등에 효율적임
+  // 결론 => html 이 먼저 렌더링이 된 후 useEffect 가 실행 됨
+  // [] => dependency 라고 함. useEffect 실행 조건을 넣을 수 있는 곳. state 또는 변수를 여러개 넣을 수 있음
+  // 이어서, [] 컴포넌트 mount 시 1회만 실행하고 싶으면 이렇게 비워놓으면 됨. 이해안가면 직접 , [] 없애보고 테스트 비교
+  // useEffect 동작 전에 실행되는 return. 별명 => clean up function 이라 불리움
+  // 기존 타이머는 제거해주세요. 즉 기존 코드는 clear 해주게끔 여기에 많이 작성함
+  // 예를 들어 데이터 요청이 2~3초 걸리는데 가져오는 도중에 재 렌더링이 되어버리면 버그가 많아질 수도 있음
+  // 그래서 기존 데이터 요청은 제거해주세요 라던지 등등 이런식으로 코드 짜면 매우 효율적임
+  // 따라서 html 렌더링 후 useEffect 가 실행되기 전에 return 문이 먼저 동작함
+  // 참고로 clean up function 은 최초 mount 시에는 실행 x, unmount 시 실행됨
+  // =====정리=====
+  // 1. useEffect( () => { })     1. 재렌더링마다 코드를 실행하고 싶을 때 사용. useEffect 실행 전에 실행하려면 clean up function 각각 중괄호 안에 return () => {} 
+  // 2. useEffect( () => { }, []) 2. mount 시 1회만 실행하고 싶을 때 사용. useEffect 실행 전에 실행하려면 clean up function 각각 중괄호 안에 return () => {}
+  // 3. useEffect( () => {        3. unmount 시 1회만 실행하고 싶을 때 사용
+  //      return () => {
+  //    }
+  //  }, [])
+  useEffect( () => {
+    let timer = setTimeout( () => { setShow(false); }, 2000);
+    // console.log(2);
   
+    return () => {
+      // console.log(1);
+      clearTimeout(timer);
+    }
+  }, []);
+
+  // useEffect 를 사용하여 숫자 말고 문자를 입력했을 때 alert 띄워줌
+  // useEffect( () => {
+  //   if(isNaN(num) == true) {
+  //     alert('문자만가능해요');
+  //   }
+  // }, [num]); 
+
   return (
       <div className="container">
-
+        {
+          show == true ? // 삼항연산자를 이용하여 useState 스위치가 true 이면 보여주고 아니면 안보이게끔
+          <div className="alert alert-warning"></div> : null
+        }
+        
+        {count}
+        <button onClick={ () => { setCount(count + 1) } }>버튼</button>
         {/* <YellowBtn bg="blue">버튼</YellowBtn>
         <YellowBtn bg="orange">버튼</YellowBtn> */}
           <div className="row">
@@ -37,7 +85,10 @@ function Detail(props) { // App.js 에 있는 데이터를 바인딩 하기 위�
               <img src="https://codingapple1.github.io/shop/shoes1.jpg" width="100%" alt=""/>
             </div>
             <div className="col-md-6">
-              {/* 현재 url 파라미터에 입력한 숫자 변수를 사용할 수 있는 훅 => useParams 라이브러리 */}
+              {/* useEffect 를 사용하여 숫자 말고 문자를 입력했을 때 alert 띄워줌 */}
+              {/* <input onChange={ (e) => {setNum(e.target.value)}} /> */}
+
+              {/* 현재 url 파라미터에 입력한 숫자 변수를 사용할 수 있도록 하는 훅 => useParams 라이브러리 사용 */}
               <h4 className="pt-5">{props.shoes[id].title}</h4>
               <p>{props.shoes[id].content}</p>
               <p>{props.shoes[id].price}</p>
