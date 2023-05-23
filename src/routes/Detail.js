@@ -30,7 +30,7 @@ function Detail(props) { // App.js 에 있는 데이터를 바인딩 하기 위�
 
   let [show, setShow] = useState(true); // 2초 뒤에 보이고 사라지는 것을 구현 할 스위치
   let [count, setCount] = useState(0);
-  let [num, setNum] = useState('');
+  let [num, setNum] = useState(''); // 인풋에 숫자가 아닌 문자를 입력했을 때 사용하기 위한 state
   // useEffect => mount 또는 update 될 때 코드를 실행해줌
   // useEffect 동작원리, 사용 이유 => useEffect 안에 있는 코드는 html 을 먼저 렌더링 한 후에 동작한다.
   // html 을 조금 더 빨리 보여주기 위해서 시간이 오래걸리는 어려운 코드는 html 먼저 렌더링 후 동작하게 끔
