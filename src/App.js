@@ -4,14 +4,16 @@ import { Navbar, Container, Nav, Form, Card } from 'react-bootstrap'  // 리액�
 import { useState } from 'react';
 // import 작명 from './data.js'; // data.js 에서 만든 변수 한개 import 방법
 // import { a, b } from './data.js'; // data.js 에서 만든 변수 여러개 import 방법
-import data from './data.js'; // data 는 자유롭게 작명하지만 변수와 동일하게 작명하는 것이 인지하기 좋음
+import data from './data.js'; // data 라고 되어있는 변수는 자유롭게 작명하지만 export 하는 변수와 동일하게 작명하는 것이 인지하기 좋음
 import { Routes, Route, Link, useNavigate, Outlet } from 'react-router-dom'
 import Detail from './routes/Detail.js';
+import axios from 'axios';
 
 function App() {
 
-  let [shoes] = useState(data);
+  let [shoes, setShoes] = useState(data);
   let navigate = useNavigate(); // 페이지 이동을 도와주는 함수. 훅의 일종
+  let [loding, setLoding] = useState(false); // 로딩 상태를 저장하는 state
 
   return (
     <div className="App">
@@ -47,6 +49,61 @@ function App() {
               }
             </div>
           </div>
+
+          <button onClick={ () => { // axios 터미널에서 라이브러리 설치 후 import
+
+            setLoding(true); // 버튼을 누른 직후 로딩 UI 띄우기 위해 setLoding state 를 true 로 바꿔줌
+
+            axios.get('https://codingapple1.github.io/shop/data2.json').then( (result) => { // 데이터 결과값은 result 에 있음
+              console.log(result.data); // result 에서 data 만 출력
+              console.log(shoes); // ajax 에서 받아온 데이터도 shoes 에 있는 데이터와 형식이 같음 [ { } ] array 안에 object 형식
+              let copy = [...shoes, ...result.data]; // 복사본을 만들어서 shoes 데이터와 ajax 에서 받아온 result.data 괄호를 벗겨주고 카피본 생성
+              setShoes(copy)
+              setLoding(false); // 데이터 가져오기에 성공했을 때 setLoding state 를 false 로 바꾸어줌
+            }).catch( () => { // 데이터 가져오기 실패했을 때 예외처리
+              console.log('실패');
+              setLoding(false); // 데이터 가져오기에 성공했을 때 setLoding state 를 false 로 바꾸어줌
+            });
+
+            // 더보기 버튼을 최초 누르면 첫번째 ajax 통신. 한번더 더보기 버튼을 누르면 두번째 ajax 통신 연습
+            // axios.get('https://codingapple1.github.io/shop/data2.json')
+            //   .then((result) => {
+            //     console.log(result.data);
+            //     console.log(shoes);
+            //     let copy = [...shoes, ...result.data];
+            //     setShoes(copy);
+            //     return axios.get('https://codingapple1.github.io/shop/data3.json');
+            //   })
+            //   .then((result) => {
+            //     console.log(result.data);
+            //     console.log(shoes);
+            //     let copy = [...shoes, ...result.data];
+            //     setShoes(copy);
+            //   })
+            //   .catch(() => {
+            //     console.log('실패');
+            //   });
+
+            // axios.post('asd', { name : 'park' }) // 서버로 데이터 전송하는 POST 요청하는 방법
+
+            // Promise.all( [ axios.get('/url1'), axios.get('/url2') ]).then( () => { // 동시에 ajax 요청 여러개 하는 방법
+            // });
+
+            // 참고 !!! => 원래는 서버와 문자만 주고 받을 수 있음
+            // let copy = [...shoes, ...result.data]; 방금 서버에서 array 데이터 온 것 같지만 
+            // 이런식으로 object 자료에 "{ "name" : "park" }" 따옴표를 작성하면 array, object 도 주고 받기 가능함
+            // 일명 문자 취급을 받는 JSON 이라고 함. 그래서 위의 데이터는 실제로는 JSON 데이터로 온거임
+            // JSON 형태로 온 데이터를 axios 가 다시 array, object 로 자동으로 바꾸어줌
+
+            // axios 라이브러리를 사용하지 않고도 fetch 라는 JS 기본 문법으로도 GET 요청 가능함.
+            // fetch('https://codingapple1.github.io/shop/data2.json')
+            // .then(result => result.json()) JSON => array, object 로 직접 변환 과정이 필요함
+            // .then(data => {})
+            // 결론 => axios 는 변환 과정 없이 JSON 형태로 온 데이터를 array, object 로 자동으로 바꾸어주어서 더 편리함
+
+          }}>더보기
+            {loding && <div>로딩 중...</div>}
+          </button>
           </>
         } />
 
