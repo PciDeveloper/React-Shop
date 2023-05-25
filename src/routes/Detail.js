@@ -143,4 +143,10 @@ function Tab(props) {
 //   }
 // }
 
+// if 문을 안쓰고 하는 방법도 있음
+// props.tab 이 0 이면 return 문 array 자료에서 0 번 자료를 꺼내줄거여서
+// function TabContent( {tab, tab2} ){ // tab2 처럼 또 다른 props 도 추가 가능함
+//   return [ <div>내용0</div>, <div>내용1</div>, <div>내용2</div> ][props.tab]
+// }
+
 export default Detail;
