@@ -7,6 +7,7 @@ import { createContext, useState } from 'react';
 import data from './data.js'; // data 라고 되어있는 변수는 자유롭게 작명하지만 export 하는 변수와 동일하게 작명하는 것이 인지하기 좋음
 import { Routes, Route, Link, useNavigate, Outlet } from 'react-router-dom'
 import Detail from './routes/Detail.js';
+import Cart from './routes/Cart.js';
 import axios from 'axios';
 
 export let Context1 = createContext(); // 세팅 1 => Context 를 하나 만들어줌 state 보관하는 역할, 가져다 쓰기 위한 export
@@ -141,7 +142,9 @@ function App() {
         </Route>
 
         {/* 지정된 경로 외에 다른 모든 페이지 접속시 404 Error */}
-        <Route path='*' element={ <div>404 Error !!!</div> } /> 
+        <Route path='*' element={ <div>404 Error !!!</div> } />
+
+        <Route path='/cart' element={ <Cart />} />
       </Routes>
     </div>
   );
