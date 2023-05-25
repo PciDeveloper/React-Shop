@@ -1,4 +1,6 @@
+import { tab } from "@testing-library/user-event/dist/tab";
 import React, { useEffect, useState } from "react";
+import { Nav } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import styled from "styled-components"; // styled-components 를 사용하면 css 파일 없어도 JS 파일에서 전부 해결 가능
 
@@ -24,13 +26,15 @@ function Detail(props) { // App.js 에 있는 데이터를 바인딩 하기 위�
   // array자료.find(()=>{ return 조건식 }) 
   // 이렇게 쓰면 조건식에 맞는 자료를 찾아서 이 자리에 남겨줌
   let { id } = useParams();
-  // let 찾은상품 = props.shoes.find(function(x) {
-  //   return x.id == id
-  // });
+  let 찾은상품 = props.shoes.find(function(x) {
+    return x.id == id
+  });
 
   let [show, setShow] = useState(true); // 2초 뒤에 보이고 사라지는 것을 구현 할 스위치
   let [count, setCount] = useState(0);
   let [num, setNum] = useState(''); // 인풋에 숫자가 아닌 문자를 입력했을 때 사용하기 위한 state
+  let [tab, setTab] = useState(0); // 탭 상태를 저장해주는 state 0, 1, 2 버튼 있음
+
   // useEffect => mount 또는 update 될 때 코드를 실행해줌
   // useEffect 동작원리, 사용 이유 => useEffect 안에 있는 코드는 html 을 먼저 렌더링 한 후에 동작한다.
   // html 을 조금 더 빨리 보여주기 위해서 시간이 오래걸리는 어려운 코드는 html 먼저 렌더링 후 동작하게 끔
@@ -89,14 +93,54 @@ function Detail(props) { // App.js 에 있는 데이터를 바인딩 하기 위�
               {/* <input onChange={ (e) => {setNum(e.target.value)}} /> */}
 
               {/* 현재 url 파라미터에 입력한 숫자 변수를 사용할 수 있도록 하는 훅 => useParams 라이브러리 사용 */}
-              <h4 className="pt-5">{props.shoes[id].title}</h4>
-              <p>{props.shoes[id].content}</p>
-              <p>{props.shoes[id].price}</p>
+              <h4 className="pt-5">{찾은상품.title}</h4>
+              <p>{찾은상품.content}</p>
+              <p>{찾은상품.price}</p>
               <button className="btn btn-danger">주문하기</button> 
             </div>
           </div>
+
+          {/* defaultActiveKey => 페이지 처음 진입했을 때 기본으로 눌려있을 버튼 지정 */}
+          <Nav variant="tabs" defaultActiveKey="link0">
+            <Nav.Item>
+              <Nav.Link onClick={ () => { setTab(0) } } eventKey="link0">버튼0</Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link onClick={ () => { setTab(1) } } eventKey="link1">버튼1</Nav.Link>
+            </Nav.Item>
+            <Nav.Item>
+              <Nav.Link onClick={ () => { setTab(2) } } eventKey="link2">버튼2</Nav.Link>
+            </Nav.Item>
+          </Nav>
+
+          {/* html 안에서는 if 문 작성을 하지 못하므로 Tab 컴포넌트 생성후 적용 */}
+          {/* 컴포넌트는 return 문을 꼭 사용해야함 컴포넌트는 return 문이 없으면 동작 안함 */}
+          {/* tab 이라는 state 를 Tab 컴포넌트에서 사용하기 위함  */}
+          <Tab tab={ tab }/>
+          
       </div>
   )
 }
+
+function Tab(props) {
+  if (props.tab == 0) {
+    return <div>내용0</div>
+  } else if (props.tab == 1) {
+    return <div>내용1</div>
+  } else if (props.tab == 2){
+    return <div>내용2</div>
+  }
+}
+
+// props 방법이 귀찮으면 컴포넌트 파라미터에 { } 안에 props 이름을 넣어주면 가능함
+// function Tab( {tab} ) { 
+//   if (tab == 0) {
+//     return <div>내용0</div>
+//   } else if (tab == 1) {
+//     return <div>내용1</div>
+//   } else if (tab == 2){
+//     return <div>내용2</div>
+//   }
+// }
 
 export default Detail;
