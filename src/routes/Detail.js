@@ -74,7 +74,7 @@ function Detail(props) { // App.js 에 있는 데이터를 바인딩 하기 위�
   // }, [num]); 
 
   return (
-      <div className="container">
+      <div className="container star">
         {
           show == true ? // 삼항연산자를 이용하여 useState 스위치가 true 이면 보여주고 아니면 안보이게끔
           <div className="alert alert-warning"></div> : null
@@ -122,31 +122,50 @@ function Detail(props) { // App.js 에 있는 데이터를 바인딩 하기 위�
   )
 }
 
-function Tab(props) {
-  if (props.tab == 0) {
-    return <div>내용0</div>
-  } else if (props.tab == 1) {
-    return <div>내용1</div>
-  } else if (props.tab == 2){
-    return <div>내용2</div>
-  }
-}
-
-// props 방법이 귀찮으면 컴포넌트 파라미터에 { } 안에 props 이름을 넣어주면 가능함
-// function Tab( {tab} ) { 
-//   if (tab == 0) {
-//     return <div>내용0</div>
-//   } else if (tab == 1) {
-//     return <div>내용1</div>
-//   } else if (tab == 2){
-//     return <div>내용2</div>
-//   }
-// }
-
 // if 문을 안쓰고 하는 방법도 있음
 // props.tab 이 0 이면 return 문 array 자료에서 0 번 자료를 꺼내줄거여서
-// function TabContent( {tab, tab2} ){ // tab2 처럼 또 다른 props 도 추가 가능함
-//   return [ <div>내용0</div>, <div>내용1</div>, <div>내용2</div> ][props.tab]
+// tab2 처럼 또 다른 props 도 이어서 추가 가능함
+// 탭 state 가 변할 때 마다 end 부착
+function Tab( {tab} ){
+
+  let [fade, setFade] = useState('');
+
+  useEffect( () => {
+    let a = setTimeout( () => { // tab state 가 변경된 후 0.1초 후에 ~ 시점을, 텀을 조금더 이후로 미뤄야 동작함
+      setFade('end'); // clean up function 이 실행 된 후 다시 state 를 end 로 바꿔줌
+    }, 100);
+    
+    // tab 이라는 state 가 변경될 때 마다 실행. 
+    // 즉, useEffect 가 동작 하기 전에 초기화 함수를 사용하여 공백으로 바꾸어주고
+    // 현재는 clean up function 이 필요가 없는 이유는
+    // 리액트는 state 변경함수를 쓸 때마다 재렌더링을 시켜주는 것이 아니고,
+    // state 변경이 다 되고 나서 재렌더링을 딱 한번 시켜주기 때문에 변화를 못느낌.
+    // 그래서 그 텀을 주기위해서 clean up function 으로 초기화 시켜주는 방법 말고
+    // setTimeout 으로 미세한 시간차를 주면 됨
+    return () => {
+      clearTimeout(a); // 타이머 삭제
+      setFade(''); 
+    }
+  }, [tab]);
+
+  return (
+    // className={ 'start ' + fade } => 클래스 start 와 state 변수 fade 를 클래스로 같이 사용하고 싶을 때 평소대로 클래스 적고 스페이스바 후 이어서 변수 작성
+    <div className={ 'start ' + fade }>
+      {
+        [ <div>내용0</div>, <div>내용1</div>, <div>내용2</div> ][tab]
+      }
+    </div>
+  )
+}
+
+// function Tab(props) {
+//   if (props.tab == 0) {
+//     return <div>내용0</div>
+//   } else if (props.tab == 1) {
+//     return <div>내용1</div>
+//   } else if (props.tab == 2){
+//     return <div>내용2</div>
+//   }
 // }
 
 export default Detail;
