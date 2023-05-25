@@ -1,7 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
 import { Navbar, Container, Nav, Form, Card } from 'react-bootstrap'  // 리액트 부트스트랩 라이브러리
-import { useState } from 'react';
+import { createContext, useState } from 'react';
 // import 작명 from './data.js'; // data.js 에서 만든 변수 한개 import 방법
 // import { a, b } from './data.js'; // data.js 에서 만든 변수 여러개 import 방법
 import data from './data.js'; // data 라고 되어있는 변수는 자유롭게 작명하지만 export 하는 변수와 동일하게 작명하는 것이 인지하기 좋음
@@ -9,9 +9,16 @@ import { Routes, Route, Link, useNavigate, Outlet } from 'react-router-dom'
 import Detail from './routes/Detail.js';
 import axios from 'axios';
 
+export let Context1 = createContext(); // 세팅 1 => Context 를 하나 만들어줌 state 보관하는 역할, 가져다 쓰기 위한 export
+
 function App() {
 
   let [shoes, setShoes] = useState(data);
+
+  // 10 => 0 번째 상품의 재고, 11 => 1 번째 상품의 재고, 12 => 2 번째 상품의 재고
+  // Context API 사용하여 Detail, Tab 컴포넌트에서 사용하려고 만듬
+  let [재고] = useState([10, 11, 12]);
+
   let navigate = useNavigate(); // 페이지 이동을 도와주는 함수. 훅의 일종
   let [loding, setLoding] = useState(false); // 로딩 상태를 저장하는 state
 
@@ -112,7 +119,14 @@ function App() {
         {/* Detail.js 파일을 따로 만들어서 컴포넌트 관리 후 import */}
         {/* Detail.js 에 만들어놓은 컴포넌트에서 props 를 사용하여 데이터 전송 받아서 사용하기 */}
         {/* /detail/:id => URL 파라미터 문법 */}
-        <Route path='/detail/:id' element={ <Detail shoes={ shoes }/> } />
+        {/* 세팅 2 => <Context1.Provider> 보관함.Provider로 state 공유를 원하는 컴포넌트 감싸기 */}
+        {/* 세팅 3 => 공유를 원하는 state 항목을 Context1.Provider 에 value 추가 */}
+        {/* 결론 => 현재 Detail.js 컴포넌트 안에 모든 컴포넌트는 value 에 작성한 state 를 자유롭게 사용 가능 */}
+        <Route path='/detail/:id' element={ 
+          <Context1.Provider value={ { shoes, 재고 } }>
+            <Detail shoes={ shoes }/>
+          </Context1.Provider>
+        } />
 
         {/* Nested Routes => 태그 안에 태그가 들어간 Routes */}
         {/* 언제 사용하면 좋은지 => 유사한 관련 여러가지 페이지가 필요할 때 */}

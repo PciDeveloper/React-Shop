@@ -1,8 +1,10 @@
 import { tab } from "@testing-library/user-event/dist/tab";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { Nav } from "react-bootstrap";
 import { useParams } from "react-router-dom";
 import styled from "styled-components"; // styled-components 를 사용하면 css 파일 없어도 JS 파일에서 전부 해결 가능
+
+import {Context1} from './../App'; // App.js 에서 만든 Context state import
 
 // styled-components 장점은 페이지 로딩시간 단축
 // props 문법을 사용하면 여러 변수 안만들어도 여러 작업 가능
@@ -18,6 +20,11 @@ import styled from "styled-components"; // styled-components 를 사용하면 cs
 // let NewBtn = styled.button(YellowBtn); // 기존 스타일 복사 가능
 
 function Detail(props) { // App.js 에 있는 데이터를 바인딩 하기 위해 props
+
+  // 상단에 Context1 import 후 useContext() 이것까지 마무리 해주어야 사용이 가능해짐
+  // object 자료로 { shoes, 재고 } state 가 들어있음
+  // 변수에 저장해서 사용
+  let {shoes, 재고} = useContext(Context1);
   
   // App.js '/detail/:id' => id 에 적었던 파라미터 정보가 useParams 훅 여기에 가져와줌
   // 현재 shoes라는 상품데이터들 안에 id : 0 이런 고유 번호가 있음
@@ -100,6 +107,9 @@ function Detail(props) { // App.js 에 있는 데이터를 바인딩 하기 위�
             </div>
           </div>
 
+          {/* 모든 과정을 거치고 이렇게 props 안써도 App.js 에 있던 state 를 가져다가 사용할 수 있음 Context 훅 */}
+          {'재고 ' + 재고[0]} 
+
           {/* defaultActiveKey => 페이지 처음 진입했을 때 기본으로 눌려있을 버튼 지정 */}
           <Nav variant="tabs" defaultActiveKey="link0">
             <Nav.Item>
@@ -115,7 +125,14 @@ function Detail(props) { // App.js 에 있는 데이터를 바인딩 하기 위�
 
           {/* html 안에서는 if 문 작성을 하지 못하므로 Tab 컴포넌트 생성후 적용 */}
           {/* 컴포넌트는 return 문을 꼭 사용해야함 컴포넌트는 return 문이 없으면 동작 안함 */}
-          {/* tab 이라는 state 를 Tab 컴포넌트에서 사용하기 위함  */}
+
+          {/* props 방법이 싫으면 두가지 방법이 있음*/}
+          {/* 1. Context API (리액트 기본문법) 사용 => 성능이슈, 컴포넌트 재활용에 단점이 있음 */}
+          {/* - state 변경시 쓸데 없는 것 까지 재렌더링이 됨 => 성능이슈
+              - 자식 컴포넌트가 Context 를 사용하여 state 를 가져다가 쓰고있다면
+              - 나중에 다른페이지에서 그 자식 컴포넌트를 import 해서 재사용하려면 이상해짐 */}
+              
+          {/* 2. Redux 외부 라이브러리 사용 */}
           <Tab tab={ tab }/>
           
       </div>
@@ -129,6 +146,7 @@ function Detail(props) { // App.js 에 있는 데이터를 바인딩 하기 위�
 function Tab( {tab} ){
 
   let [fade, setFade] = useState('');
+  let {재고} = useContext(Context1);
 
   useEffect( () => {
     let a = setTimeout( () => { // tab state 가 변경된 후 0.1초 후에 ~ 시점을, 텀을 조금더 이후로 미뤄야 동작함
@@ -152,7 +170,8 @@ function Tab( {tab} ){
     // className={ 'start ' + fade } => 클래스 start 와 state 변수 fade 를 클래스로 같이 사용하고 싶을 때 평소대로 클래스 적고 스페이스바 후 이어서 변수 작성
     <div className={ 'start ' + fade }>
       {
-        [ <div>내용0</div>, <div>내용1</div>, <div>내용2</div> ][tab]
+        // App.js 에서 Context 훅을 사용하여 Detail 컴포넌트 이외에 그의 자식 컴포넌트들도 state 사용할 수 있음
+        [ <div>재고 : {재고[0]}</div>, <div>내용1</div>, <div>내용2</div> ][tab]
       }
     </div>
   )
