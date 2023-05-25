@@ -43,7 +43,9 @@ function App() {
               {
                 shoes.map(function(a, i) {
                   return (
-                    <Goods shoes={ shoes[i] } i={i + 1} ></Goods> // 하단에 Goods 컴포넌트 생성
+                    // 하단에 Goods 컴포넌트 생성
+                    // key 값을 넣으면 배열을 렌더링 할 때 성능을 최적화 하는데 도움을 줌
+                    <Goods shoes={ shoes[i] } i={i + 1} key={i} ></Goods>
                   )
                 })
               }
