@@ -15,7 +15,8 @@ function Cart() {
     let c = useSelector( (state) => { return state } );
     // console.log(c.basket);
 
-	let dispatch = useDispatch(); // store.js 로 요청을 하는 함수
+	// store.js 로 요청을 하는 함수
+	let dispatch = useDispatch(); 
 
     return (
         <div>
