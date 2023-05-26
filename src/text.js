@@ -9,7 +9,7 @@
 
 let name = 'park';
 let age = 20;
-console.log()
+
 let person = { 
     name,
     age
