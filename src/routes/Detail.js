@@ -6,6 +6,9 @@ import styled from "styled-components"; // styled-components 를 사용하면 cs
 
 import {Context1} from './../App'; // App.js 에서 만든 Context state import
 
+import { addItem } from "./../store.js";
+import { useDispatch } from "react-redux";
+
 // styled-components 장점은 페이지 로딩시간 단축
 // props 문법을 사용하면 여러 변수 안만들어도 여러 작업 가능
 // props => props.bg == 'blue' ? 'white' : 'black' => 색상이 블루인지? 맞으면 white 아니라면 black
@@ -41,6 +44,7 @@ function Detail(props) { // App.js 에 있는 데이터를 바인딩 하기 위�
   let [count, setCount] = useState(0);
   let [num, setNum] = useState(''); // 인풋에 숫자가 아닌 문자를 입력했을 때 사용하기 위한 state
   let [tab, setTab] = useState(0); // 탭 상태를 저장해주는 state 0, 1, 2 버튼 있음
+
 
   // useEffect => mount 또는 update 될 때 코드를 실행해줌
   // useEffect 동작원리, 사용 이유 => useEffect 안에 있는 코드는 html 을 먼저 렌더링 한 후에 동작한다.
@@ -80,6 +84,8 @@ function Detail(props) { // App.js 에 있는 데이터를 바인딩 하기 위�
   //   }
   // }, [num]); 
 
+  let dispatch = useDispatch();
+
   return (
       <div className="container star">
         {
@@ -103,7 +109,9 @@ function Detail(props) { // App.js 에 있는 데이터를 바인딩 하기 위�
               <h4 className="pt-5">{찾은상품.title}</h4>
               <p>{찾은상품.content}</p>
               <p>{찾은상품.price}</p>
-              <button className="btn btn-danger">주문하기</button> 
+              <button className="btn btn-danger" onClick={ () => {
+                dispatch(addItem( { id : 3, name : 'Red Yordan', count : 100 } ))
+              }}>주문하기</button> 
             </div>
           </div>
 

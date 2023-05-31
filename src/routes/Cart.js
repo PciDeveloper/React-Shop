@@ -1,6 +1,7 @@
 import { Table } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import { changeName } from "./../store.js"; // Redux state 변경 함수 import 후 useDispatch() 라는 훅 사용하고 진행
+import { changeName, increase } from "./../store/userSlice.js"; // Redux state 변경 함수 import 후 useDispatch() 라는 훅 사용하고 진행
+import { addCount } from "./../store.js";
 
 
 // Redux 를 사용하면 컴포넌트들이 props 없이 state 공유가 가능함 좋음
@@ -24,7 +25,8 @@ function Cart() {
 			{/* 최종적으로 변경 버튼을 누를시 dispatch() 를 사용하여 stroe.js 에서 만든 state 를 변경하는 작업을 해보았음.
 				Redux 를 이용하여 state 변경 하는 과정이 다소 복잡할 수 있지만,
 				서비스의 규모가 커질수록 버그 같은 것을 방지할 수 있어서 좋은 방법임 */}
-			{a.user} 의 장바구니
+			<h6> { a.user.name } { a.user.age } 의 장바구니</h6>
+            <button onClick={ () => { dispatch(increase(100)) } }>버튼</button>
 
             <Table>
                 <thead>
@@ -52,7 +54,9 @@ function Cart() {
 											// 3. 변경 함수 만들어논 store.js 를 import 후
 											// 4. let dispatch = useDispatch(); store.js 로 요청을 하는 함수를 만들고,
 											// 5. 최종적으로 변수명 dispatch() 안에 state import 해온 변경 함수를 넣어주면 됨
-											dispatch(changeName()); 
+                                            // dispatch(addCount(c.cart[i].id)); => 해당 상품의 고유 id 값의 버튼이 클릭되면,
+                                            // store.js payload 에 id 값을 넘기고
+											dispatch(addCount(c.cart[i].id));
 										}}> + </button>
 									</td>
                                 </tr>
