@@ -1,7 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
 import { Navbar, Container, Nav, Form, Card } from 'react-bootstrap'  // 리액트 부트스트랩 라이브러리
-import { createContext, useState } from 'react';
+import { createContext, useEffect, useState } from 'react';
 // import 작명 from './data.js'; // data.js 에서 만든 변수 한개 import 방법
 // import { a, b } from './data.js'; // data.js 에서 만든 변수 여러개 import 방법
 import data from './data.js'; // data 라고 되어있는 변수는 자유롭게 작명하지만 export 하는 변수와 동일하게 작명하는 것이 인지하기 좋음
@@ -14,6 +14,15 @@ export let Context1 = createContext(); // 세팅 1 => Context 를 하나 만들�
 
 function App() {
 
+  // DB 저장 없이 웹브라우저 개발자모드 localStorage 에 저장하는 방법이 있는데
+  // object 또는 array 자료형은 저장 못함. 이러한 자료들은 JSON 으로 변환 후 저장하면 가능함
+  // let obj = { name : 'park' }
+  // localStorage.setItem('data', JSON.stringify(obj)); // JSON.stringify => object 또는 array 자료형을 문자열로 변환
+  // let 꺼낸거 = localStorage.getItem('data');
+  
+  // console.log(JSON.parse(꺼낸거)); // JSON.parse => 다시 object 또는 array 로 변환
+  // console.log(꺼낸거);
+  
   let [shoes, setShoes] = useState(data);
 
   // 10 => 0 번째 상품의 재고, 11 => 1 번째 상품의 재고, 12 => 2 번째 상품의 재고
@@ -53,7 +62,7 @@ function App() {
                   return (
                     // 하단에 Goods 컴포넌트 생성
                     // key 값을 넣으면 배열을 렌더링 할 때 성능을 최적화 하는데 도움을 줌
-                    <Goods shoes={ shoes[i] } i={i + 1} key={i} ></Goods>
+                    <Goods shoes={ shoes[i] } i={i} key={i} ></Goods>
                   )
                 })
               }
@@ -169,10 +178,10 @@ function Goods(props) {
   // let [modalTitle, setModalTitle] = useState(0); 여기에 선언해도 되지만 
   // state 가 App, Goods 등등 여러곳에서 필요하다면 가장 상위 부모 컴포넌트에 만드는게 좋음
   return (
-    <div className="col-md-4">
+    <div className="col-md-4" onClick={ () => window.location.href = '/detail/' + props.i }>
     {/* 기존 이미지 URL  => https://codingapple1.github.io/shop/shoes1 ,2, 3 */}
     {/* i 라는 이름으로 1,2,3 전송해서 URL 파라미터로 숫자를 넘겨서 이미지를 보여주는 방법 (함수 파라미터 문법) */}
-    <img src={'https://codingapple1.github.io/shop/shoes' + props.i + '.jpg'} width="80%" alt=''/> 
+    <img src={'https://codingapple1.github.io/shop/shoes' + (props.i + 1) + '.jpg'} width="80%" alt=''/> 
       <h4>{ props.shoes.title }</h4>
       <p>{ props.shoes.price }</p>
     </div>

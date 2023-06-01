@@ -24,6 +24,11 @@ import { useDispatch } from "react-redux";
 
 function Detail(props) { // App.js 에 있는 데이터를 바인딩 하기 위해 props
 
+  useEffect( () => {
+    localStorage.setItem('watched', JSON.stringify( [] ) );
+    
+  }, []);
+
   // 상단에 Context1 import 후 useContext() 이것까지 마무리 해주어야 사용이 가능해짐
   // object 자료로 { shoes, 재고 } state 가 들어있음
   // 변수에 저장해서 사용
@@ -36,9 +41,7 @@ function Detail(props) { // App.js 에 있는 데이터를 바인딩 하기 위�
   // array자료.find(()=>{ return 조건식 }) 
   // 이렇게 쓰면 조건식에 맞는 자료를 찾아서 이 자리에 남겨줌
   let { id } = useParams();
-  let 찾은상품 = props.shoes.find(function(x) {
-    return x.id == id
-  });
+  let 찾은상품 = props.shoes.find(function(x) { return x.id == id } );
 
   let [show, setShow] = useState(true); // 2초 뒤에 보이고 사라지는 것을 구현 할 스위치
   let [count, setCount] = useState(0);
