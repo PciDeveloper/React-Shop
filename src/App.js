@@ -9,6 +9,7 @@ import { Routes, Route, Link, useNavigate, Outlet } from 'react-router-dom'
 import Detail from './routes/Detail.js';
 import Cart from './routes/Cart.js';
 import axios from 'axios';
+import { useQuery } from 'react-query';
 
 export let Context1 = createContext(); // 세팅 1 => Context 를 하나 만들어줌 state 보관하는 역할, 가져다 쓰기 위한 export
 
@@ -22,7 +23,7 @@ function App() {
   
   // console.log(JSON.parse(꺼낸거)); // JSON.parse => 다시 object 또는 array 로 변환
   // console.log(꺼낸거);
-  
+
   let [shoes, setShoes] = useState(data);
 
   // 10 => 0 번째 상품의 재고, 11 => 1 번째 상품의 재고, 12 => 2 번째 상품의 재고
@@ -31,6 +32,31 @@ function App() {
 
   let navigate = useNavigate(); // 페이지 이동을 도와주는 함수. 훅의 일종
   let [loding, setLoding] = useState(false); // 로딩 상태를 저장하는 state
+
+  // 서버에서 유저 이름 가져와서 보여주기
+  // react-query로 ajax 요청하는 법
+  // then 파라미터 a 에 유저 데이터 결과값 들어있음
+  // 사용법 => useQuery('작명', () => {}
+  // useQuery 장점 => 성공, 실패, 로딩중 쉽게 파악이 가능함
+  // result.data => 요청에 성공했을 때 가져오는 데이터가 있음
+  // result.isLoading => 요청중, 로딩중일 때 isLoading true 로 됨
+  // result.error => 요청에 실패했을 때 error true
+  // 장점 2 => 틈만나면 자동으로 실시간으로 refetch 해줌 (SNS, 코인거래소 등 유용함)
+  // let result = useQuery('작명', () =>
+  //   axios.get('https://codingapple1.github.io/userdata.json').then((response) => response.data)
+  // );
+
+  // 위의 코드에서 useQuery의 콜백 함수를 async 함수로 변경하고, 
+  // await을 사용하여 비동기 작업을 처리하였음.
+  // 이렇게 함으로써 데이터를 제대로 가져올 수 있었음
+  let result = useQuery('작명', async () => {
+    const response = await axios.get('https://codingapple1.github.io/userdata.json');
+    console.log('요청완료')
+    return response.data;
+  });
+
+  
+  
 
   return (
     <div className="App">
@@ -42,6 +68,15 @@ function App() {
             <Nav.Link onClick={ () => { navigate('/') }}>Home</Nav.Link>
             <Nav.Link onClick={ () => { navigate('/cart') }}>Cart</Nav.Link>
           </Nav>
+
+          <Nav className='ms-auto'>
+            {/* 왼쪽이 true 이면 && 오른쪽 값 */}
+            {/* 쌩 리액트는 우선 state 부터 만들었어야 했음 */}
+            { result.data && result.data.name }
+            { result.isLoading && '로딩중' }
+            { result.error && '에러' }
+          </Nav>
+
         </Container>
       </Navbar>
 
