@@ -1,15 +1,23 @@
 import logo from './logo.svg';
 import './App.css';
 import { Navbar, Container, Nav, Form, Card } from 'react-bootstrap'  // 리액트 부트스트랩 라이브러리
-import { createContext, useEffect, useState } from 'react';
+import { lazy, Suspense, createContext, useEffect, useState } from 'react';
 // import 작명 from './data.js'; // data.js 에서 만든 변수 한개 import 방법
 // import { a, b } from './data.js'; // data.js 에서 만든 변수 여러개 import 방법
 import data from './data.js'; // data 라고 되어있는 변수는 자유롭게 작명하지만 export 하는 변수와 동일하게 작명하는 것이 인지하기 좋음
 import { Routes, Route, Link, useNavigate, Outlet } from 'react-router-dom'
-import Detail from './routes/Detail.js';
-import Cart from './routes/Cart.js';
+
 import axios from 'axios';
 import { useQuery } from 'react-query';
+
+// import Detail from './routes/Detail.js';
+// import Cart from './routes/Cart.js';
+// 메인 첫 페이지에서는 먼저 로드할 필요가 없으니 성능 개선을 위해서
+// lazy() 하게 로딩 하라는 코드임 필요해질 때 import 해달라는 뜻
+// 사이트 발행할 떄도 별도의 js 파일로 분리됨
+// 단점 => detail, cart 페이지 이동시 로딩이 발생됨 => 이럴 때는 Suspense import 후 <Suspense></Suspense>로 감싸면 로딩중 UI 넣기 가능
+const Detail = lazy( () => import('./routes/Detail.js'));
+const Cart = lazy( () => import('./routes/Cart.js'));
 
 export let Context1 = createContext(); // 세팅 1 => Context 를 하나 만들어줌 state 보관하는 역할, 가져다 쓰기 위한 export
 
@@ -63,7 +71,7 @@ function App() {
 
       <Navbar bg="light" variant="light">
         <Container>
-          <Navbar.Brand href="#home">ELSI</Navbar.Brand>
+          <Navbar.Brand href="/">ELSI</Navbar.Brand>
           <Nav className="me-auto">
             <Nav.Link onClick={ () => { navigate('/') }}>Home</Nav.Link>
             <Nav.Link onClick={ () => { navigate('/cart') }}>Cart</Nav.Link>
@@ -81,115 +89,117 @@ function App() {
       </Navbar>
 
       {/* 라우터로 페이지 나누는 방법 */}
-      <Routes>
-        <Route path='/' element={
-          <>
-          {/* <div className='main-bg' style={ { backgroundImage : 'url(' + img + ')' } }></div> */}
-          <div className='main-bg'></div>
-        
-          <div className="container">
-            <div className="row">
-              {/* process.env.PUBLIC_URL => public 폴더 이미지를 사용하는 권장 방식 */}
-              {/* <img src={ process.env.PUBLIC_URL + '/shoes1.jpg' } width="80%" alt=''/> */}
+      <Suspense fallback={<div>로딩중</div>}>
+        <Routes>
+          <Route path='/' element={
+            <>
+            {/* <div className='main-bg' style={ { backgroundImage : 'url(' + img + ')' } }></div> */}
+            <div className='main-bg'></div>
+          
+            <div className="container">
+              <div className="row">
+                {/* process.env.PUBLIC_URL => public 폴더 이미지를 사용하는 권장 방식 */}
+                {/* <img src={ process.env.PUBLIC_URL + '/shoes1.jpg' } width="80%" alt=''/> */}
 
-              {
-                shoes.map(function(a, i) {
-                  return (
-                    // 하단에 Goods 컴포넌트 생성
-                    // key 값을 넣으면 배열을 렌더링 할 때 성능을 최적화 하는데 도움을 줌
-                    <Goods shoes={ shoes[i] } i={i} key={i} ></Goods>
-                  )
-                })
-              }
+                {
+                  shoes.map(function(a, i) {
+                    return (
+                      // 하단에 Goods 컴포넌트 생성
+                      // key 값을 넣으면 배열을 렌더링 할 때 성능을 최적화 하는데 도움을 줌
+                      <Goods shoes={ shoes[i] } i={i} key={i} ></Goods>
+                    )
+                  })
+                }
+              </div>
             </div>
-          </div>
 
-          <button onClick={ () => { // axios 터미널에서 라이브러리 설치 후 import
+            <button onClick={ () => { // axios 터미널에서 라이브러리 설치 후 import
 
-            setLoding(true); // 버튼을 누른 직후 로딩 UI 띄우기 위해 setLoding state 를 true 로 바꿔줌
+              setLoding(true); // 버튼을 누른 직후 로딩 UI 띄우기 위해 setLoding state 를 true 로 바꿔줌
 
-            axios.get('https://codingapple1.github.io/shop/data2.json').then( (result) => { // 데이터 결과값은 result 에 있음
-              console.log(result.data); // result 에서 data 만 출력
-              console.log(shoes); // ajax 에서 받아온 데이터도 shoes 에 있는 데이터와 형식이 같음 [ { } ] array 안에 object 형식
-              let copy = [...shoes, ...result.data]; // 복사본을 만들어서 shoes 데이터와 ajax 에서 받아온 result.data 괄호를 벗겨주고 카피본 생성
-              setShoes(copy)
-              setLoding(false); // 데이터 가져오기에 성공했을 때 setLoding state 를 false 로 바꾸어줌
-            }).catch( () => { // 데이터 가져오기 실패했을 때 예외처리
-              console.log('실패');
-              setLoding(false); // 데이터 가져오기에 성공했을 때 setLoding state 를 false 로 바꾸어줌
-            });
+              axios.get('https://codingapple1.github.io/shop/data2.json').then( (result) => { // 데이터 결과값은 result 에 있음
+                console.log(result.data); // result 에서 data 만 출력
+                console.log(shoes); // ajax 에서 받아온 데이터도 shoes 에 있는 데이터와 형식이 같음 [ { } ] array 안에 object 형식
+                let copy = [...shoes, ...result.data]; // 복사본을 만들어서 shoes 데이터와 ajax 에서 받아온 result.data 괄호를 벗겨주고 카피본 생성
+                setShoes(copy)
+                setLoding(false); // 데이터 가져오기에 성공했을 때 setLoding state 를 false 로 바꾸어줌
+              }).catch( () => { // 데이터 가져오기 실패했을 때 예외처리
+                console.log('실패');
+                setLoding(false); // 데이터 가져오기에 성공했을 때 setLoding state 를 false 로 바꾸어줌
+              });
 
-            // 더보기 버튼을 최초 누르면 첫번째 ajax 통신. 한번더 더보기 버튼을 누르면 두번째 ajax 통신 연습
-            // axios.get('https://codingapple1.github.io/shop/data2.json')
-            //   .then((result) => {
-            //     console.log(result.data);
-            //     console.log(shoes);
-            //     let copy = [...shoes, ...result.data];
-            //     setShoes(copy);
-            //     return axios.get('https://codingapple1.github.io/shop/data3.json');
-            //   })
-            //   .then((result) => {
-            //     console.log(result.data);
-            //     console.log(shoes);
-            //     let copy = [...shoes, ...result.data];
-            //     setShoes(copy);
-            //   })
-            //   .catch(() => {
-            //     console.log('실패');
-            //   });
+              // 더보기 버튼을 최초 누르면 첫번째 ajax 통신. 한번더 더보기 버튼을 누르면 두번째 ajax 통신 연습
+              // axios.get('https://codingapple1.github.io/shop/data2.json')
+              //   .then((result) => {
+              //     console.log(result.data);
+              //     console.log(shoes);
+              //     let copy = [...shoes, ...result.data];
+              //     setShoes(copy);
+              //     return axios.get('https://codingapple1.github.io/shop/data3.json');
+              //   })
+              //   .then((result) => {
+              //     console.log(result.data);
+              //     console.log(shoes);
+              //     let copy = [...shoes, ...result.data];
+              //     setShoes(copy);
+              //   })
+              //   .catch(() => {
+              //     console.log('실패');
+              //   });
 
-            // axios.post('asd', { name : 'park' }) // 서버로 데이터 전송하는 POST 요청하는 방법
+              // axios.post('asd', { name : 'park' }) // 서버로 데이터 전송하는 POST 요청하는 방법
 
-            // Promise.all( [ axios.get('/url1'), axios.get('/url2') ]).then( () => { // 동시에 ajax 요청 여러개 하는 방법
-            // });
+              // Promise.all( [ axios.get('/url1'), axios.get('/url2') ]).then( () => { // 동시에 ajax 요청 여러개 하는 방법
+              // });
 
-            // 참고 !!! => 원래는 서버와 문자만 주고 받을 수 있음
-            // let copy = [...shoes, ...result.data]; 방금 서버에서 array 데이터 온 것 같지만 
-            // 이런식으로 object 자료에 "{ "name" : "park" }" 따옴표를 작성하면 array, object 도 주고 받기 가능함
-            // 일명 문자 취급을 받는 JSON 이라고 함. 그래서 위의 데이터는 실제로는 JSON 데이터로 온거임
-            // JSON 형태로 온 데이터를 axios 가 다시 array, object 로 자동으로 바꾸어줌
+              // 참고 !!! => 원래는 서버와 문자만 주고 받을 수 있음
+              // let copy = [...shoes, ...result.data]; 방금 서버에서 array 데이터 온 것 같지만 
+              // 이런식으로 object 자료에 "{ "name" : "park" }" 따옴표를 작성하면 array, object 도 주고 받기 가능함
+              // 일명 문자 취급을 받는 JSON 이라고 함. 그래서 위의 데이터는 실제로는 JSON 데이터로 온거임
+              // JSON 형태로 온 데이터를 axios 가 다시 array, object 로 자동으로 바꾸어줌
 
-            // axios 라이브러리를 사용하지 않고도 fetch 라는 JS 기본 문법으로도 GET 요청 가능함.
-            // fetch('https://codingapple1.github.io/shop/data2.json')
-            // .then(result => result.json()) JSON => array, object 로 직접 변환 과정이 필요함
-            // .then(data => {})
-            // 결론 => axios 는 변환 과정 없이 JSON 형태로 온 데이터를 array, object 로 자동으로 바꾸어주어서 더 편리함
+              // axios 라이브러리를 사용하지 않고도 fetch 라는 JS 기본 문법으로도 GET 요청 가능함.
+              // fetch('https://codingapple1.github.io/shop/data2.json')
+              // .then(result => result.json()) JSON => array, object 로 직접 변환 과정이 필요함
+              // .then(data => {})
+              // 결론 => axios 는 변환 과정 없이 JSON 형태로 온 데이터를 array, object 로 자동으로 바꾸어주어서 더 편리함
 
-          }}>더보기
-            {loding && <div>로딩 중...</div>}
-          </button>
-          </>
-        } />
+            }}>더보기
+              {loding && <div>로딩 중...</div>}
+            </button>
+            </>
+          } />
 
-        {/* Detail.js 파일을 따로 만들어서 컴포넌트 관리 후 import */}
-        {/* Detail.js 에 만들어놓은 컴포넌트에서 props 를 사용하여 데이터 전송 받아서 사용하기 */}
-        {/* /detail/:id => URL 파라미터 문법 */}
-        {/* 세팅 2 => <Context1.Provider> 보관함.Provider로 state 공유를 원하는 컴포넌트 감싸기 */}
-        {/* 세팅 3 => 공유를 원하는 state 항목을 Context1.Provider 에 value 추가 */}
-        {/* 결론 => 현재 Detail.js 컴포넌트 안에 모든 컴포넌트는 value 에 작성한 state 를 자유롭게 사용 가능 */}
-        <Route path='/detail/:id' element={ 
-          <Context1.Provider value={ { shoes, 재고 } }>
-            <Detail shoes={ shoes }/>
-          </Context1.Provider>
-        } />
+          {/* Detail.js 파일을 따로 만들어서 컴포넌트 관리 후 import */}
+          {/* Detail.js 에 만들어놓은 컴포넌트에서 props 를 사용하여 데이터 전송 받아서 사용하기 */}
+          {/* /detail/:id => URL 파라미터 문법 */}
+          {/* 세팅 2 => <Context1.Provider> 보관함.Provider로 state 공유를 원하는 컴포넌트 감싸기 */}
+          {/* 세팅 3 => 공유를 원하는 state 항목을 Context1.Provider 에 value 추가 */}
+          {/* 결론 => 현재 Detail.js 컴포넌트 안에 모든 컴포넌트는 value 에 작성한 state 를 자유롭게 사용 가능 */}
+          <Route path='/detail/:id' element={
+            <Context1.Provider value={ { shoes, 재고 } }>
+              <Detail shoes={ shoes }/>
+            </Context1.Provider>
+          } />
 
-        {/* Nested Routes => 태그 안에 태그가 들어간 Routes */}
-        {/* 언제 사용하면 좋은지 => 유사한 관련 여러가지 페이지가 필요할 때 */}
-        <Route path='/about' element={ <About /> } >
-          <Route path='member' element={ <div> 직원들 </div> } />
-          <Route path='location' element={ <div> 오시는 길 </div> } />
-        </Route>
+          {/* Nested Routes => 태그 안에 태그가 들어간 Routes */}
+          {/* 언제 사용하면 좋은지 => 유사한 관련 여러가지 페이지가 필요할 때 */}
+          <Route path='/about' element={ <About /> } >
+            <Route path='member' element={ <div> 직원들 </div> } />
+            <Route path='location' element={ <div> 오시는 길 </div> } />
+          </Route>
 
-        <Route path='/event' element={ <Event /> } >
-          <Route path='one' element={ <div> 첫 주문시 양배추즙 서비스 </div> } />
-          <Route path='two' element={ <div> 생일 기념 쿠폰 받기 </div> } />
-        </Route>
+          <Route path='/event' element={ <Event /> } >
+            <Route path='one' element={ <div> 첫 주문시 양배추즙 서비스 </div> } />
+            <Route path='two' element={ <div> 생일 기념 쿠폰 받기 </div> } />
+          </Route>
 
-        {/* 지정된 경로 외에 다른 모든 페이지 접속시 404 Error */}
-        <Route path='*' element={ <div>404 Error !!!</div> } />
+          {/* 지정된 경로 외에 다른 모든 페이지 접속시 404 Error */}
+          <Route path='*' element={ <div>404 Error !!!</div> } />
 
-        <Route path='/cart' element={ <Cart />} />
-      </Routes>
+          <Route path='/cart' element={ <Cart />} />
+        </Routes>
+      </Suspense>
     </div>
   );
 }
