@@ -2,25 +2,49 @@ import { Table } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { changeName, increase } from "./../store/userSlice.js"; // Redux state 변경 함수 import 후 useDispatch() 라는 훅 사용하고 진행
 import { addCount } from "./../store.js";
+import { memo, useMemo, useState } from "react";
+
+// 성능개선 2 => 자식 컴포넌트 재렌더링 막기
+// memo => Child 컴포넌트가 꼭 필요할 때만 재렌더링 되게 하는 방법임
+// memo 함수의 원리 => 특정 상황에서 (props가 변할 때만) 재렌더링을 시켜주는 원리
+let Child = memo(function () {
+    console.log('재렌더링됨');
+    return <div>자식 컴포넌트임</div>
+});
+
+function 함수() {
+    return
+}
 
 
 // Redux 를 사용하면 컴포넌트들이 props 없이 state 공유가 가능함 좋음
 // 단, 컴포넌트간 state 공유가 필요 없으면 그냥 Redux 에 보관하지 않고
 // 사용하고자 하는 컴포넌트에서 useState() 사용하는게 더 편할 듯
 function Cart() {
+    // useMemo => 컴포넌트 렌더링시 1회만 실행해줌
+    // useMemo( () => { return 함수() }, []); => useMemo 또한 [] dependency 를 제공함
+    // useMemo == useEffect 똑같은 원리이긴 한데
+    // useEffect 는 html 동작 후 실행되지만,
+    // useMemo 렌더링 될 때 같이 실행 됨
+    // 결론은 실행 시점이 다를 뿐이지 기능은 유사함
+    let result = useMemo( () => { return 함수() }, []);
 
     // store.js 에서 만든 Redux store 를 가져와서 사용하는 방법
     // useSelector( (state) => { return state }); => Redux store 에 있던 object 자료 state 가 남음
     let a = useSelector( (state) => { return state } );
-
     let c = useSelector( (state) => { return state } );
     // console.log(c.basket);
 
 	// store.js 로 요청을 하는 함수
-	let dispatch = useDispatch(); 
+	let dispatch = useDispatch();
+
+    let [count, setCount] = useState(0); // Cart 컴포넌트가 재렌더링 되는 상황 만들기
 
     return (
         <div>
+            {/* Child 컴포넌트가 꼭 필요할 때만 재렌더링 되게 하는 방법은 memo */}
+            <Child></Child>
+            <button onClick={ () => { setCount(count + 1) } }>+</button>
 
 			{/* 최종적으로 변경 버튼을 누를시 dispatch() 를 사용하여 stroe.js 에서 만든 state 를 변경하는 작업을 해보았음.
 				Redux 를 이용하여 state 변경 하는 과정이 다소 복잡할 수 있지만,
