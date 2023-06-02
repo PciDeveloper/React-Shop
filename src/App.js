@@ -1,7 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
 import { Navbar, Container, Nav, Form, Card } from 'react-bootstrap'  // 리액트 부트스트랩 라이브러리
-import { lazy, Suspense, createContext, useEffect, useState } from 'react';
+import { lazy, Suspense, createContext, useEffect, useState, useTransition, useDeferredValue } from 'react';
 // import 작명 from './data.js'; // data.js 에서 만든 변수 한개 import 방법
 // import { a, b } from './data.js'; // data.js 에서 만든 변수 여러개 import 방법
 import data from './data.js'; // data 라고 되어있는 변수는 자유롭게 작명하지만 export 하는 변수와 동일하게 작명하는 것이 인지하기 좋음
@@ -20,6 +20,9 @@ const Detail = lazy( () => import('./routes/Detail.js'));
 const Cart = lazy( () => import('./routes/Cart.js'));
 
 export let Context1 = createContext(); // 세팅 1 => Context 를 하나 만들어줌 state 보관하는 역할, 가져다 쓰기 위한 export
+
+// 성능개선 3 => useTransition 성능 향상을 해보기위해 성능 저하를 일으켜보는 중
+let a = new Array(10000).fill(0)
 
 function App() {
 
@@ -63,8 +66,16 @@ function App() {
     return response.data;
   });
 
-  
-  
+  // 성능개선 3 => useTransition 성능개선 사용하기 위한 state
+  // 성능 저하를 시키고있는 부분을 startTransition 으로 state 변경 감싸기 => 현재는 setName state 가 저하시키는 원인임
+  // 관례상 startTransition(늦게처리) 라고 작명함.
+  // isPending 은 startTransition 이 동작하고 있을 때 true 로 됨
+  // 사용 예시 => 1. UI 요소를 부드럽게 전환하기 위해 사용됨 (사용자가 특정 버튼을 클릭했을 때 애니메이션 효과) 등
+  // useDeferredValue 훅 또한 useTransition 와 동일한 기능을 하는 훅
+  // useDeferredValue 에 성능 저하의 state 를 안에 넣어주고 그것을 담은 변수를 가지고 활용하면 됨
+  let [name, setName] = useState('');
+  let [isPending, 늦게처리] = useTransition();
+  let state = useDeferredValue(name);
 
   return (
     <div className="App">
@@ -167,6 +178,28 @@ function App() {
             }}>더보기
               {loding && <div>로딩 중...</div>}
             </button>
+
+            {/* 성능개선 3 => useTransition 으로 느린 컴포넌트 성능을 향상시키는 방법 (카드 돌려막기) */}
+            {/* 성능 저하를 일으키기위해 상단에 실험용 a 변수에 array 자료 만들어놨음 */}
+            {/* input 에 타이핑을 할 때마다 그 name 값이 렌더링되는 중임 */}
+            <input onChange={ (e) => { 
+                // 성능 저하를 시키고있는 부분을 startTransition 함수로 state 변경 감싸기 => 현재는 setName state 가 저하시키는 원인임
+                // 브라우저는 싱글스레드라서 동시 작업을 못함. 한번에 하나의 작업만 가능함
+                // 그래서 useTransition 원리는 현재 성능 문제가 되는 setName 코드 시작을 뒤로 늦춰주는 원리
+                늦게처리( () => {
+                  setName(e.target.value)  
+                });
+              }} />
+            {
+              // isPending == true 이면 '로딩중' UI 보여주고 그게 아니면 반복문 보여줌
+              // useDeferredValue 훅 또한 useTransition 와 동일한 기능을 하는 훅
+              // useDeferredValue 에 성능 저하의 state 를 안에 넣어주고 그것을 담은 변수명(state)을 가지고 활용하면 됨
+              isPending ? '로딩중' :
+              a.map( () => {
+                return <div>{name}</div> // 현재 {name} state 는 setName 즉 input 에 입력한 값을 name state 가 가지고있음
+                // return <div>{state}</div>
+              })
+            }
             </>
           } />
 
