@@ -195,8 +195,8 @@ function App() {
               // useDeferredValue 훅 또한 useTransition 와 동일한 기능을 하는 훅
               // useDeferredValue 에 성능 저하의 state 를 안에 넣어주고 그것을 담은 변수명(state)을 가지고 활용하면 됨
               isPending ? '로딩중' :
-              a.map( () => {
-                return <div>{name}</div> // 현재 {name} state 는 setName 즉 input 에 입력한 값을 name state 가 가지고있음
+              a.map( (a, i) => {
+                return <div key={i}>{name}</div> // 현재 {name} state 는 setName 즉 input 에 입력한 값을 name state 가 가지고있음
                 // return <div>{state}</div>
               })
             }
