@@ -72,6 +72,7 @@ let cart = createSlice({
 export let { changeName, increase } = user.actions
 export let { addCount, addItem } = cart.actions
 
+// 여기에 등록하여야 사용 가능함
 // 작명 : user.reducer => 작명이 귀찮으면 오른쪽에 state 이름이랑 동일하게 하고
 // user.reducer => 여기서의 user 는 state name 에서 지정한 이름
 export default configureStore({ // 이 코드 복붙하고 시작

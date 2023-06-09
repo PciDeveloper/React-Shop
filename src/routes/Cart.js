@@ -39,6 +39,8 @@ function Cart() {
     // console.log(a.cart);
 
 	// store.js 로 요청을 하는 함수
+    // dispatch 는 store 에 값을 넣는다고 생각하고,
+    // 반대로 useSelector 는 store 에 있는 값을 반환하여 사용한다고 생각하면 됨
 	let dispatch = useDispatch();
 
     let [count, setCount] = useState(0); // Cart 컴포넌트가 재렌더링 되는 상황 만들기
