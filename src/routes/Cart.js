@@ -29,11 +29,14 @@ function Cart() {
     // 결론은 실행 시점이 다를 뿐이지 기능은 유사함
     let result = useMemo( () => { return 함수() }, []);
 
-    // store.js 에서 만든 Redux store 를 가져와서 사용하는 방법
+    // Redux store 즉, store.js 에서 만든 state를 가져와서 사용하는 방법
     // useSelector( (state) => { return state }); => Redux store 에 있던 object 자료 state 가 남음
+    // (state) => { return state } 이렇게 한 이유는 공식문서에 이렇게 사용하라고 나와있음
+    // 현재는 store 에 2개의 state 가 있음 (user, cart) 그래서 그에 맞게 변수 두개 만들고 사용했음
     let a = useSelector( (state) => { return state } );
     let c = useSelector( (state) => { return state } );
-    // console.log(c.basket);
+    // console.log(a.user);
+    // console.log(a.cart);
 
 	// store.js 로 요청을 하는 함수
 	let dispatch = useDispatch();
@@ -50,7 +53,7 @@ function Cart() {
 				Redux 를 이용하여 state 변경 하는 과정이 다소 복잡할 수 있지만,
 				서비스의 규모가 커질수록 버그 같은 것을 방지할 수 있어서 좋은 방법임 */}
 			<h6> { a.user.name } { a.user.age } 의 장바구니</h6>
-            <button onClick={ () => { dispatch(increase(100)) } }>버튼</button>
+            <button onClick={ () => { dispatch(increase(1)) } }>버튼</button>
 
             <Table>
                 <thead>
